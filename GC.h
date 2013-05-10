@@ -1,0 +1,14 @@
+#ifndef GC_H
+#define GC_H
+
+/////////////////////////////////////////////
+//
+// GC (Gene Conversion) common header file
+//
+/////////////////////////////////////////////
+
+typedef long Scalar;
+
+#include "VectorUtility.h"
+
+#endif // GC_H
