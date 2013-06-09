@@ -4,8 +4,8 @@ CPP  = g++
 CC   = g++
 
 CXXINCLUDEDIR = 
-CXXLDFLAGS = -g3
-CXXFLAGS = $(CXXINCLUDEDIR) -Wall -g3 -fno-inline 
+CXXLDFLAGS = -g3 -ggdb
+CXXFLAGS = $(CXXINCLUDEDIR) -Wall -g3 -ggdb -fno-inline 
 RM = rm -f
 
 OBJ  = chrom-gc.o \
