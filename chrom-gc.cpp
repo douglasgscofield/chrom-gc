@@ -4,7 +4,7 @@
 
 typedef long Scalar;
 
-main () {
+int main () {
     Chromosome C(1000);
     C.set_mu(0.0000001);
     C.set_c(0.000001);

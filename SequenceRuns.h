@@ -32,13 +32,20 @@ class SequenceRuns {
                 T_COUNT  length;
                 T_ITEM   item;
                 void print(std::ostream& os = std::cout) const
-                { os << "(" << run_index << " @" << position << " " << item 
-                    << ": " << length << " )"; };
+                { 
+                    os << "(" << run_index << " @" << position << " " << item 
+                        << ": " << length << " )";
+                };
                 void print_table(std::ostream& os = std::cout) const
-                { os << run_index << "\t" << position << "\t" << length 
-                    << "\t" << item << std::endl; };
+                { 
+                    os << run_index << "\t" << position << "\t" << length 
+                        << "\t" << item << std::endl;
+                };
                 friend std::ostream& operator<<(std::ostream& os, const Run& R)
-                { R.print(os); };
+                { 
+                    R.print(os); 
+                    return(os);
+                };
         };
 
         typedef typename std::vector<T_ITEM>                     item_list_type;
@@ -201,7 +208,9 @@ class SequenceRuns {
         friend std::ostream& operator<<(std::ostream& os, const SequenceRuns& s)
         { 
             s._trace(" friend operator<< ( os, s )");
-            s.print(os); os << std::endl; 
+            s.print(os); 
+            os << std::endl; 
+            return(os);
         };
 };
 

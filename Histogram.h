@@ -39,7 +39,7 @@ class Histogram {
                    const std::string& nf = "")
         { value_name = nv; count_name = nc; freq_name = nf; };
 
-        long int size() { return(Hist.size()); }
+        size_t size() { return(Hist.size()); }
 
         void fill(const std::vector<T_VALUE>& Vec,
                   bool drop_zero = true,
@@ -61,7 +61,7 @@ class Histogram {
                     Hist[value] = static_cast<T_COUNT>(0);
                 }
             }
-            for (long i = 0; i < Vec.size(); ++i) { Hist[Vec[i]]++; }
+            for (size_t i = 0; i < Vec.size(); ++i) { Hist[Vec[i]]++; }
         };
 
         void print(std::ostream& os = std::cout,
@@ -112,7 +112,12 @@ class Histogram {
         };
 
         friend std::ostream& operator<<(std::ostream& os, const Histogram& h) 
-        { os << "Histogram:  "; h.print(os); os << std::endl; };
+        { 
+            os << "Histogram:  "; 
+            h.print(os); 
+            os << std::endl; 
+            return(os);
+        };
 };
 
 #endif // __HISTOGRAM_H__

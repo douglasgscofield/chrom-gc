@@ -26,7 +26,7 @@ Chromosome::repair1 ( )
     _trace("repair1 ( )");
 
     const bool dbgthis = true;
-    bool       truncated = true;
+    bool       truncated = false;
 
     if (DSBreakQueue.size() == 0) { return; }
     if (dbgthis) {
@@ -57,9 +57,10 @@ Chromosome::repair1 ( )
             if (tract_length > 0) {
                 SeqSize tract_end = event.event_site + (tract_length * dir);
                 // truncate the end of the tract to the end of the chromosome
-                if (tract_end < 0) 
-                    { tract_end = 0; truncated = true; }
-                else if (tract_end >= get_nbp()) { 
+                if (tract_end < 0) { 
+                    tract_end = 0; 
+                    truncated = true;
+                } else if (tract_end >= get_nbp()) { 
                     tract_end = get_nbp() - 1; 
                     truncated = true; 
                 }
@@ -72,7 +73,9 @@ Chromosome::repair1 ( )
                         << event.event_site 
                         << "  dir = " << dir 
                         << "  tract_length = " << tract_length
-                        << "  tract_end = " << tract_end << std::endl;
+                        << "  tract_end = " << tract_end 
+                        << "  truncated = " << truncated
+                        << std::endl;
                     print_centered(std::cout, event.event_site);
                     std::cout << std::endl;
                 }

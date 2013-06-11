@@ -4,8 +4,7 @@ CPP  = g++
 CC   = g++
 
 CXXINCLUDEDIR = 
-CXXLDFLAGS = -g3 -ggdb
-CXXFLAGS = $(CXXINCLUDEDIR) -Wall -g3 -ggdb -fno-inline 
+CXXFLAGS = $(CXXINCLUDEDIR) -D_FILE_OFFSET_BITS=64 -Wall -ggdb -g3 -fno-inline-small-functions -O0 -fno-inline -fno-eliminate-unused-debug-types
 RM = rm -f
 
 OBJ  = chrom-gc.o \
@@ -32,7 +31,7 @@ all: all-before $(BIN) all-after
 
 
 $(BIN): $(OBJ)
-	$(CPP) $(CXXLDFLAGS) $(OBJ) -o $@ $(LIBS)
+	$(CPP) $(CXXFLAGS) $(OBJ) -o $@ $(LIBS)
 
 $(OBJ): $(HEADER)
 

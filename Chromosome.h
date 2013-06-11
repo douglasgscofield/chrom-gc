@@ -29,8 +29,13 @@ class Chromosome {
 
     public:
 
-        // a better choice is typedef sequence_type::size_type SeqSize;
-        typedef long SeqSize; 
+        typedef short            bp;  // begin expanding our concept of bp here
+        enum                     bp_state { HOMZ = 0, HETZ = 1 };
+        bool                     is_homozygous(bp state) { return(state == HOMZ); }
+        bool                     is_heterozygous(bp state) { return(state == HETZ); }
+        typedef std::vector<bp>  sequence_type;
+
+        typedef sequence_type::size_type SeqSize;
 
     private:
 
@@ -41,12 +46,6 @@ class Chromosome {
         RandUniform           Unif;
 
     public:
-
-        typedef short         bp;  // begin expanding our concept of bp here
-        enum                  bp_state { HOMZ = 0, HETZ = 1 };
-        bool                  is_homozygous(bp state) { return(state == HOMZ); }
-        bool                  is_heterozygous(bp state) { return(state == HETZ); }
-        typedef std::vector<bp>  sequence_type;
 
         sequence_type         X;
 
@@ -91,8 +90,8 @@ class Chromosome {
     public:
 
         Chromosome(const int sn = 0) 
-            : _mu(0.0), _c(0.0), _did_mutate(false), _did_break(false),
-              _random_seed(RANDOM_SEED_FLAG), _debug_trace(false)
+            : _nbp(0), _random_seed(RANDOM_SEED_FLAG), _mu(0.0), _did_mutate(false), 
+              _c(0.0), _did_break(false), _debug_trace(false)
         { _trace("CONSTRUCTOR ( sn )"); init(sn); };
 
         ~Chromosome() { /* empty */ };
@@ -285,6 +284,7 @@ class Chromosome {
         {
             c._trace(" friend operator<< ( os, c )");
             os << "Chromosome:  "; c.print(os); os << std::endl;
+            return(os);
         };
 };
 
@@ -310,7 +310,7 @@ Chromosome::print_stats(std::ostream& os, bool header) const
         os << "Chromosome:: Summary Statistics" << std::endl; 
         os << "===============================" << std::endl;
     }
-    Histogram<bp, Scalar> site_histogram ( X, false);
+    Histogram<bp, Scalar> site_histogram (X, false);
     site_histogram.names("bp_state", "num_sites", "freq_sites");
     site_histogram.print_table(os, header);
 };

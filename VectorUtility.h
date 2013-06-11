@@ -91,7 +91,7 @@ namespace VectorUtility {
         T ans;
         if (Vec.size() == 0) return(static_cast<T>(-9999999));
         if (Vec.size() > 1) { ans = Max(Vec[0], Vec[1]); } else { return(Vec[0]); }
-        for (long i = 2; i < Vec.size(); ++i) { ans = Max(ans, Vec[i]); }
+        for (size_t i = 2; i < Vec.size(); ++i) { ans = Max(ans, Vec[i]); }
         return(ans);
     }
 
@@ -109,7 +109,7 @@ namespace VectorUtility {
         T ans;
         if (Vec.size() == 0) return(static_cast<T>(9999999));
         if (Vec.size() > 1) { ans = Min(Vec[0], Vec[1]); } else { return(Vec[0]); }
-        for (long i = 2; i < Vec.size(); ++i) { ans = Min(ans, Vec[i]); }
+        for (size_t i = 2; i < Vec.size(); ++i) { ans = Min(ans, Vec[i]); }
         return(ans);
     }
 
@@ -124,9 +124,9 @@ namespace VectorUtility {
     inline void 
     Trim(std::vector<T>& Vec, const T& val = ((T)0)) 
     {
-        long trim = 0;
+        size_t trim = 0;
         assert(Vec.size() > 0);
-        for (long i = Vec.size() - 1; i >= 0; --i) {
+        for (size_t i = Vec.size() - 1; i >= 0; --i) {
             if (Vec[i] == val) { ++trim; } else { break; }
         }
         Vec.resize(Vec.size() - trim);
@@ -137,7 +137,7 @@ namespace VectorUtility {
     IsIn(const std::vector<T>& Vec, const T& val)
     {
         assert(Vec.size() > 0);
-        for (long i = 0; i < Vec.size(); ++i) { if (val == Vec[i]) return(true); }
+        for (size_t i = 0; i < Vec.size(); ++i) { if (val == Vec[i]) return(true); }
         return(false);
     }
 
@@ -146,10 +146,10 @@ namespace VectorUtility {
     Seq(const T& from, const T& to)
     {
         T by = (from > to) ? static_cast<T>(-1) : static_cast<T>(1);
-        long N = ABS(to - from) + 1;
+        size_t N = ABS(to - from) + 1;
         std::vector<T> ans(N);
         T val = from;
-        for (long i = 0; i < N; val += by, ++i) {
+        for (size_t i = 0; i < N; val += by, ++i) {
             ans[i] = val;
         }
         return(ans);
@@ -162,7 +162,7 @@ namespace VectorUtility {
         std::vector<T> ans; // vector to hold the unique values
         assert(Vec.size() > 0);
         ans.push_back(Vec[0]);
-        for (long i = 1; i < Vec.size(); ++i) {
+        for (size_t i = 1; i < Vec.size(); ++i) {
             if (! IsIn(ans, Vec[i])) { ans.push_back(Vec[i]); }
         }
         return(ans);
@@ -178,7 +178,7 @@ namespace VectorUtility {
         std::map<T, std::vector<Scalar> > m;
         Scalar thisrun = 1;
         T prev = Vec[0];
-        for (long i = 1; i < Vec.size(); ++i) {
+        for (size_t i = 1; i < Vec.size(); ++i) {
             if (Vec[i] == prev) { ++thisrun; }
             else {
                 m[prev].push_back(thisrun);
