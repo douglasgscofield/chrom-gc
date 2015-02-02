@@ -21,12 +21,12 @@ Chromosome::dsbreak()
     //    the DSBreakEventLog entry and does its thing.
     //
 
-    SeqSize num_sites = get_nbp() - min_DSB_site; // number of potential break sites
+    SeqSize_t num_sites = get_nbp() - min_DSB_site; // number of potential breaks
     double break_event_threshold = (get_c() * num_sites);  // rate * num sites
     double event_draw;
     if ((event_draw = dsbreak_Uniform.draw()) < break_event_threshold) {
-        SeqSize breaksite = 
-            static_cast<SeqSize>((dsbreak_Uniform.draw() * num_sites)) 
+        SeqSize_t breaksite = 
+            static_cast<SeqSize_t>((dsbreak_Uniform.draw() * num_sites)) 
             + min_DSB_site;
         // we only create the entry, Chromosome::mmr() fixes it
         DSBreakEvent event;

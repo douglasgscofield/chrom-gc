@@ -46,16 +46,16 @@ Chromosome::repair1 ( )
         }
         const DSBreakEvent& event = DSBreakQueue.back();
         if (dbgthis) {
-            print_centered(std::cout, event.event_site);
+            //print_centered(std::cout, event.event_site);
         }
         if (event.event_site >= min_DSB_site) {
             // it is a valid DSB (placeholder)
             
             double dirdraw = repair1_Uniform.draw();
             int dir = (dirdraw < 0.5) ? (-1) : (1);
-            SeqSize tract_length = repair1_Geometric.draw();
+            SeqSize_t tract_length = repair1_Geometric.draw();
             if (tract_length > 0) {
-                SeqSize tract_end = event.event_site + (tract_length * dir);
+                SeqSize_t tract_end = event.event_site + (tract_length * dir);
                 // truncate the end of the tract to the end of the chromosome
                 if (tract_end < 0) { 
                     tract_end = 0; 
@@ -64,19 +64,20 @@ Chromosome::repair1 ( )
                     tract_end = get_nbp() - 1; 
                     truncated = true; 
                 }
-                for (SeqSize i = event.event_site; i != tract_end; i += dir) {
+                for (SeqSize_t i = event.event_site; i != tract_end; i += dir) {
                     X[i] = HOMZ;
                 }
                 X[tract_end] = HOMZ;
                 if (dbgthis) {
                     std::cout << "Chromosome::repair1 : site = " 
                         << event.event_site 
-                        << "  dir = " << dir 
-                        << "  tract_length = " << tract_length
-                        << "  tract_end = " << tract_end 
+                        << (dir > 0 ? " > " : " < ")
+                        << tract_end 
+                        << "  length = " << dir * long(tract_length)
                         << "  truncated = " << truncated
                         << std::endl;
-                    print_centered(std::cout, event.event_site);
+                    print_centered(std::cout, event.event_site,
+                                   dir * long(tract_length));
                     std::cout << std::endl;
                 }
             }

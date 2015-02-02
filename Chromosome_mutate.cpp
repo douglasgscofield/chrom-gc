@@ -26,7 +26,7 @@ Chromosome::mutate()
     double event_draw;
     const double homz_fraction = (1.0/3.0);
     if ((event_draw = mutate_Uniform.draw()) < mut_event_threshold) {
-        SeqSize mutsite = static_cast<SeqSize>(mutate_Uniform.draw() * get_nbp());
+        SeqSize_t mutsite = static_cast<SeqSize_t>(mutate_Uniform.draw() * get_nbp());
         bp site_old = X[mutsite];
         if (is_homozygous(X[mutsite])) { 
             X[mutsite] = HETZ; 

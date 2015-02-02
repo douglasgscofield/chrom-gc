@@ -35,11 +35,12 @@ class Chromosome {
         bool                     is_heterozygous(bp state) { return(state == HETZ); }
         typedef std::vector<bp>  sequence_type;
 
-        typedef sequence_type::size_type SeqSize;
+        typedef sequence_type::size_type       SeqSize_t;
+        typedef sequence_type::difference_type SeqTract_t;
 
     private:
 
-        SeqSize               _nbp; // nbp: number of bp to model
+        SeqSize_t             _nbp; // nbp: number of bp to model
 
         // for set_heterozygosity()
         bool                  _random_seed;
@@ -49,13 +50,13 @@ class Chromosome {
 
         sequence_type         X;
 
-        void                  set_nbp(SeqSize n) { _nbp = n; };
-        SeqSize               get_nbp() const { return(_nbp); };
+        void                  set_nbp(SeqSize_t n) { _nbp = n; };
+        SeqSize_t             get_nbp() const { return(_nbp); };
         const sequence_type&  get_sequence() { return X; };
-        SeqSize               size() const { check(); return(get_nbp()); };
+        SeqSize_t             size() const { check(); return(get_nbp()); };
         void                  fill(bp bpstate) { X.assign(get_nbp(), bpstate); };
 
-        void                  init(SeqSize nnbp = -1) 
+        void                  init(SeqSize_t nnbp = -1) 
         {
             if (nnbp >= 0) { set_nbp(nnbp); X.resize(get_nbp()); }
             Unif.init(_random_seed);
@@ -65,7 +66,7 @@ class Chromosome {
         void                  set_heterozygosity(double het = 0.0) 
         {
             fill(HOMZ);
-            for (SeqSize i = 0; i < X.size(); ++i)
+            for (SeqSize_t i = 0; i < X.size(); ++i)
                 { if (Unif.draw() < het) X[i] = HETZ; }
         };
 
@@ -111,12 +112,12 @@ class Chromosome {
 
         // Keeping track of mutation events
         struct MutationEvent {
-            long     event;
-            double   event_threshold;
-            double   event_draw;
-            SeqSize  event_site;
-            bp       val_orig;
-            bp       val_new;
+            long       event;
+            double     event_threshold;
+            double     event_draw;
+            SeqSize_t  event_site;
+            bp         val_orig;
+            bp         val_new;
 
             static void   print_header(std::ostream& os = std::cout) 
             {
@@ -177,10 +178,10 @@ class Chromosome {
         //     repaired; this is filled and emptied as
         //     DSBs are created and repaired.  
         struct DSBreakEvent { 
-            long     event;
-            double   event_threshold;
-            double   event_draw;
-            SeqSize  event_site;
+            long       event;
+            double     event_threshold;
+            double     event_draw;
+            SeqSize_t  event_site;
 
             static void print_header(std::ostream& os = std::cout) 
             {
@@ -270,15 +271,17 @@ class Chromosome {
         void                  print_stats(std::ostream& os = std::cout, 
                                           bool header = true) const;
         void                  print(std::ostream& os = std::cout, 
-                                    SeqSize startbp = 0, 
-                                    SeqSize endbp = (-1), 
-                                    SeqSize width = 75, 
-                                    const SeqSize markbp = (-1), 
+                                    SeqSize_t startbp = 0, 
+                                    SeqSize_t endbp = (-1), 
+                                    SeqSize_t width = 75, 
+                                    const SeqSize_t markbp = (-1), 
+                                    const SeqTract_t tract = 0,
                                     const bool header = true) const;
         void                  print_centered(std::ostream& os, 
-                                    const SeqSize markbp, 
-                                    const SeqSize stride = 30, 
-                                    const SeqSize width = 75) const;
+                                    const SeqSize_t markbp, 
+                                    const SeqTract_t tract = 0,
+                                    const SeqSize_t stride = 30, 
+                                    const SeqSize_t width = 75) const;
 
         friend std::ostream& operator<<(std::ostream& os, const Chromosome& c) 
         {
@@ -317,16 +320,21 @@ Chromosome::print_stats(std::ostream& os, bool header) const
 
 
 inline void
-Chromosome::print(std::ostream& os, SeqSize startbp, SeqSize endbp, 
-    SeqSize width, const SeqSize markbp, const bool header) const
+Chromosome::print(std::ostream& os, 
+                  SeqSize_t startbp, 
+                  SeqSize_t endbp, 
+                  SeqSize_t width, 
+                  const SeqSize_t markbp, 
+                  const SeqTract_t tract,
+                  const bool header) const
 {
-    _trace("print ( os, startbp, endbp, width )");
+    _trace("print ( os, startbp, endbp, width, markbp, tract, header )");
 
     const bool note_markbp = true;  // to mark the line in which markbp is located
     const bool append_markbp = true;  // to append the markbp to its line
     const bool center_markbp = true; // to center the line on the markbp
     const std::string pad = " ";
-    const SeqSize size = get_nbp();
+    const SeqSize_t size = get_nbp();
 
     if (startbp < 0 || startbp > size - 1) { startbp = 0; }
     if (endbp < 0 || endbp > size - 1) { endbp = size - 1; }
@@ -337,24 +345,25 @@ Chromosome::print(std::ostream& os, SeqSize startbp, SeqSize endbp,
         os << "  _c=" << get_c();
         os << std::endl;
     }
-    for (SeqSize i = startbp; i <= endbp; i += width) {
-        SeqSize endslice = VectorUtility::Min(i + width - 1, endbp);
-        SeqSize left_pad = 0, right_pad = 0;
+    for (SeqSize_t i = startbp; i <= endbp; i += width) {
+        SeqSize_t endslice = VectorUtility::Min(i + width - 1, endbp);
+        SeqSize_t left_pad = 0, right_pad = 0;
         if (center_markbp && markbp >= i && markbp <= endslice) {
-            SeqSize left_width = markbp - i; 
-            SeqSize right_width = endslice - markbp; 
+            SeqSize_t left_width = markbp - i; 
+            SeqSize_t right_width = endslice - markbp; 
             if (left_width < right_width)
                 { left_pad = right_width - left_width; right_pad = 0; }
             else if (left_width > right_width) 
                 { left_pad = 0; right_pad = left_width - right_width; }
         }
+        // now we have our dimensions, do tract if requested
         if (note_markbp && markbp >= i && markbp <= endslice)
             { os << std::setw(7) << i << "* "; }
         else
             { os << std::setw(7) << i << "  "; }
         while (left_pad > 0) { os << pad; --left_pad; }
-        for (SeqSize j = i; j <= endslice; ++j) {
-            if (j == markbp) { os << "|"; }
+        for (SeqSize_t j = i; j <= endslice; ++j) {
+            if (j == markbp) { os << (tract ? (tract > 0 ? ">" : "<") : "|"); }
             os << ((X[j] == true) ? "1" : "0");
             //if (j == markbp) { os << ">"; }
         }
@@ -367,14 +376,17 @@ Chromosome::print(std::ostream& os, SeqSize startbp, SeqSize endbp,
 
 
 inline void
-Chromosome::print_centered(std::ostream& os, const SeqSize markbp, 
-                           const SeqSize stride, const SeqSize width) const {
+Chromosome::print_centered(std::ostream& os, 
+                           const SeqSize_t markbp, 
+                           const SeqTract_t tract,
+                           const SeqSize_t stride, 
+                           const SeqSize_t width) const {
     _trace("print_centered ( os, markbp, stride, width )");
     // stride notes the number of bases on either side of markbp
     // to print, while width has its meaning as in print()
-    SeqSize startbp = markbp - stride;
-    SeqSize endbp = markbp + stride;
-    print(os, startbp, endbp, width, markbp, false);
+    SeqSize_t startbp = markbp - stride;
+    SeqSize_t endbp = markbp + stride;
+    print(os, startbp, endbp, width, markbp, tract, false);
 };
 
 // // // // // // // // // // // // // // // // // // // // // // // //
