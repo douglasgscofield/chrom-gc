@@ -9,6 +9,9 @@
 #include <iomanip>
 #include "VectorUtility.h"
 
+/*! @class Histogram
+    @brief Template to create a histogram of counts of unique values in a vector.
+ */
 template<class T_VALUE, class T_COUNT>
 class Histogram {
     private:
@@ -19,6 +22,15 @@ class Histogram {
         std::string freq_name;
 
     public:
+        /*! Constructor
+
+            @param Vec        vector of values, type used for template
+            @param drop_zero  bool, whether to drop zero-valued values (true)
+            @param min_val    minimum_value of histogram range
+            @param max_val    maximum_value of histogram range
+            @param use_min    bool, whether to use the minimum value (false)
+            @param use_max    bool, whether to use the maximum value (false)
+         */
         Histogram(const std::vector<T_VALUE>& Vec,
                   bool drop_zero = true,
                   T_VALUE min_val = T_VALUE(),
@@ -35,12 +47,32 @@ class Histogram {
             fill(Vec, drop_zero, min_val, max_val, use_min, use_max);
         };
 
+        /*! Create names for value, counts, and frequencies.
+
+            @param nv  string, name of value
+            @param nc  string, name of count
+            @param nf  string, name of frequency
+         */
         void names(const std::string& nv = "", const std::string& nc = "",
                    const std::string& nf = "")
         { value_name = nv; count_name = nc; freq_name = nf; };
 
+        //! Return histogram size
         size_t size() { return(Hist.size()); }
 
+        /*! Fill the histogram, workhorse method
+
+            If minimum and maximum values are not provided, use the min and
+            max from Vec unless use_min or use_max are true, respectively, then
+            use the parameter value.
+
+            @param Vec        vector of values, type used for template
+            @param drop_zero  bool, whether to drop zero-valued values (true)
+            @param min_val    minimum_value of histogram range
+            @param max_val    maximum_value of histogram range
+            @param use_min    bool, whether to use the minimum value (false)
+            @param use_max    bool, whether to use the maximum value (false)
+         */
         void fill(const std::vector<T_VALUE>& Vec,
                   bool drop_zero = true,
                   T_VALUE min_value = T_VALUE(),
@@ -64,10 +96,12 @@ class Histogram {
             for (size_t i = 0; i < Vec.size(); ++i) { Hist[Vec[i]]++; }
         };
 
+        //! Simple print method
         void print(std::ostream& os = std::cout,
                    const std::string& prefix = "") const
         { print_table(os, true, prefix); }
 
+        //! Print class contents as a table
         void print_table(std::ostream& os = std::cout,
                          const bool header = true,
                          const std::string& prefix = "") const
@@ -93,6 +127,7 @@ class Histogram {
             }
         };
 
+        //! Return a vector of observed values
         const std::vector<T_VALUE> values() const
         {
             std::vector<T_VALUE> ans;
@@ -102,6 +137,7 @@ class Histogram {
             return(ans);
         };
 
+        //! Return a vector of observed counts
         const std::vector<T_COUNT> counts() const
         {
             std::vector<T_COUNT> ans;
@@ -111,6 +147,7 @@ class Histogram {
             return(ans);
         };
 
+        //! Suitable for inclusion in an ostream oparation
         friend std::ostream& operator<<(std::ostream& os, const Histogram& h) 
         { 
             os << "Histogram:  "; 
