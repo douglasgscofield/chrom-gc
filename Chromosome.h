@@ -18,21 +18,20 @@
 #include <list>
 #include <map>
 
+/*! @class Chromosome
+ *
+ *  @brief The base-pair (bp) model and the sequence, interfaces and members.
+ */
 class Chromosome {
-
-// // // // // // // // // // // // // // // // // // // // // // // //
-// // // // // // // // // // // // // // // // // // // // // // // //
-//
-// The base-pair (bp) model and the sequence, interfaces and members
-//
-// // // // // // // // // // // // // // // // // // // // // // // //
 
     public:
 
-        typedef short            bp;  // begin expanding our concept of bp here
-        enum                     bp_state { HOMZ = 0, HETZ = 1 };
-        bool                     is_homozygous(bp state) { return(state == HOMZ); }
-        bool                     is_heterozygous(bp state) { return(state == HETZ); }
+        //! begin expanding our concept of bp here
+        typedef short bp;
+        enum          bp_state { HOMZ = 0, HETZ = 1 };
+        bool          is_homozygous(bp state)   { return(state == HOMZ); }
+        bool          is_heterozygous(bp state) { return(state == HETZ); }
+
         typedef std::vector<bp>  sequence_type;
 
         typedef sequence_type::size_type       SeqSize_t;
@@ -48,31 +47,38 @@ class Chromosome {
 
     public:
 
-        sequence_type         X;
+        sequence_type        X;
 
-        void                  set_nbp(SeqSize_t n) { _nbp = n; };
-        SeqSize_t             get_nbp() const { return(_nbp); };
-        const sequence_type&  get_sequence() { return X; };
-        SeqSize_t             size() const { check(); return(get_nbp()); };
-        void                  fill(bp bpstate) { X.assign(get_nbp(), bpstate); };
+        void                 set_nbp(SeqSize_t n) { _nbp = n; };
+        SeqSize_t            get_nbp() const      { return(_nbp); };
+        const sequence_type& get_sequence()       { return X; };
+        SeqSize_t            size() const         { check(); return(get_nbp()); };
+        void                 fill(bp bpstate)     { X.assign(get_nbp(), bpstate); };
 
-        void                  init(SeqSize_t nnbp = -1) 
+        void
+        init(SeqSize_t nnbp = -1) 
         {
-            if (nnbp >= 0) { set_nbp(nnbp); X.resize(get_nbp()); }
+            if (nnbp >= 0) {
+                set_nbp(nnbp); 
+                X.resize(get_nbp());
+            }
             Unif.init(_random_seed);
             fill(HOMZ);
         };
 
-        void                  set_heterozygosity(double het = 0.0) 
+        void
+        set_heterozygosity(double het = 0.0) 
         {
             fill(HOMZ);
-            for (SeqSize_t i = 0; i < X.size(); ++i)
-                { if (Unif.draw() < het) X[i] = HETZ; }
+            for (SeqSize_t i = 0; i < X.size(); ++i) {
+                if (Unif.draw() < het) X[i] = HETZ;
+            }
         };
 
     private:
 
-        void                  check() const 
+        void
+        check() const 
         {
             if (get_nbp() != X.size()) {
                 std::cerr << "Chromosome::check() : _nbp changed without init()"
@@ -81,21 +87,28 @@ class Chromosome {
             assert(get_nbp() == X.size());
         };
 
-// // // // // // // // // // // // // // // // // // // // // // // //
-// // // // // // // // // // // // // // // // // // // // // // // //
-//
-// Constructors and destructors
-//
-// // // // // // // // // // // // // // // // // // // // // // // //
-
     public:
 
-        Chromosome(const int sn = 0) 
-            : _nbp(0), _random_seed(RANDOM_SEED_FLAG), _mu(0.0), _did_mutate(false), 
-              _c(0.0), _did_break(false), _debug_trace(false)
-        { _trace("CONSTRUCTOR ( sn )"); init(sn); };
+        /*! constructor
 
+            @param sn   sequence size
+         */
+        Chromosome(const long sn = 0) 
+            : _nbp(0),
+              _random_seed(RANDOM_SEED_FLAG),
+              _mu(0.0),
+              _did_mutate(false), 
+              _c(0.0),
+              _did_break(false),
+              _debug_trace(false)
+        { 
+            _trace("CONSTRUCTOR ( sn )");
+            init(sn);
+        };
+
+        //! destructor
         ~Chromosome() { /* empty */ };
+
 
 // // // // // // // // // // // // // // // // // // // // // // // //
 // // // // // // // // // // // // // // // // // // // // // // // //
@@ -119,13 +132,15 @@ class Chromosome {
             bp         val_orig;
             bp         val_new;
 
-            static void   print_header(std::ostream& os = std::cout) 
+            static void
+            print_header(std::ostream& os = std::cout) 
             {
                 os << "event\tevent_threshold\tevent_draw\tevent_site" 
                     << "\tval_orig\tval_new" << std::endl;
             };
 
-            void          print(std::ostream& os = std::cout) const 
+            void
+            print(std::ostream& os = std::cout) const 
             {
                 os << event << "\t" << event_threshold << "\t" 
                     << event_draw << "\t" << event_site << "\t" 
@@ -140,20 +155,20 @@ class Chromosome {
 
     public:
 
-        void              mutate();
+        void   mutate();
 
-        double            get_mu() const { return(_mu); };
-        void              set_mu(double m) { _mu = m; };
-        bool              get_did_mutate() const { return(_did_mutate); };
-        long              number_mutations() const { return(MutationLog.size()); };
+        double get_mu() const           { return(_mu); };
+        void   set_mu(double m)         { _mu = m; };
+        bool   get_did_mutate() const   { return(_did_mutate); };
+        long   number_mutations() const { return(MutationLog.size()); };
 
-        void              print_mutations(std::ostream& os = std::cout,
-                                          bool header = true) const
+        void
+        print_mutations(std::ostream& os = std::cout, bool header = true) const
         {
-            if (header) { MutationEvent::print_header(os); }
+            if (header) MutationEvent::print_header(os);
             MutationDequeCI p;
             for (p = MutationLog.begin(); p != MutationLog.end(); ++p)
-                { (*p).print(os); }
+                (*p).print(os);
         };
 
 // // // // // // // // // // // // // // // // // // // // // // // //
@@ -185,12 +200,14 @@ class Chromosome {
             int        event_dir;
             long       event_length;
 
-            static void print_header(std::ostream& os = std::cout) 
+            static void
+            print_header(std::ostream& os = std::cout) 
             {
                 os << "event_threshold\tevent_draw\tevent_site" << std::endl;
             };
 
-            void print(std::ostream& os = std::cout) const 
+            void
+            print(std::ostream& os = std::cout) const 
             {
                 os << event_threshold << "\t" << event_draw << "\t"
                     << event_site << std::endl;
@@ -207,20 +224,19 @@ class Chromosome {
 
     public:
 
-        void              dsbreak();
+        void    dsbreak();
+        double  get_c() const           { return(_c); };
+        void    set_c(double c)         { _c = c; };
+        bool    get_did_break() const   { return(_did_break); };
+        long    number_dsbreaks() const { return(DSBreakLog.size()); };
 
-        double            get_c() const { return(_c); };
-        void              set_c(double c) { _c = c; };
-        bool              get_did_break() const { return(_did_break); };
-        long              number_dsbreaks() const { return(DSBreakLog.size()); };
-
-        void              print_dsbreaks(std::ostream& os = std::cout,
-                                         bool header = true) const
+        void
+        print_dsbreaks(std::ostream& os = std::cout, bool header = true) const
         { 
-            if (header) { DSBreakEvent::print_header(os); }
+            if (header) DSBreakEvent::print_header(os);
             DSBreakDequeCI p;
             for (p = DSBreakLog.begin(); p != DSBreakLog.end(); ++p)
-                { (*p).print(os); }
+                (*p).print(os);
         };
 
 // // // // // // // // // // // // // // // // // // // // // // // //
@@ -263,29 +279,34 @@ class Chromosome {
 
         bool                  _debug_trace;
 
-        void                  _trace(const std::string& s) const 
-        { if (_debug_trace) { std::cerr << "Chromosome::" << s << std::endl; } };
+        void
+        _trace(const std::string& s) const 
+        { 
+            if (_debug_trace) std::cerr << "Chromosome::" << s << std::endl;
+        };
 
     public:
 
-        bool                  get_debug_trace() const { return(_debug_trace); };
-        void                  set_debug_trace(bool dt) { _debug_trace = dt; };
-        void                  print_stats(std::ostream& os = std::cout, 
-                                          bool header = true) const;
-        void                  print(std::ostream& os = std::cout, 
-                                    SeqSize_t startbp = 0, 
-                                    SeqSize_t endbp = (-1), 
-                                    SeqSize_t width = 75, 
-                                    const SeqSize_t markbp = (-1), 
-                                    const SeqTract_t tract = 0,
-                                    const bool header = true) const;
-        void                  print_centered(std::ostream& os, 
-                                    const SeqSize_t markbp, 
-                                    const SeqTract_t tract = 0,
-                                    const SeqSize_t stride = 30, 
-                                    const SeqSize_t width = 75) const;
+        bool   get_debug_trace() const  { return(_debug_trace); };
+        void   set_debug_trace(bool dt) { _debug_trace = dt; };
 
-        friend std::ostream& operator<<(std::ostream& os, const Chromosome& c) 
+        void   print_stats(std::ostream& os = std::cout, 
+                           bool header = true) const;
+        void   print(std::ostream& os = std::cout, 
+                     SeqSize_t startbp = 0, 
+                     SeqSize_t endbp = (-1), 
+                     SeqSize_t width = 75, 
+                     const SeqSize_t markbp = (-1), 
+                     const SeqTract_t tract = 0,
+                     const bool header = true) const;
+        void   print_centered(std::ostream& os, 
+                              const SeqSize_t markbp, 
+                              const SeqTract_t tract = 0,
+                              const SeqSize_t stride = 30, 
+                              const SeqSize_t width = 75) const;
+
+        friend std::ostream&
+        operator<<(std::ostream& os, const Chromosome& c) 
         {
             c._trace(" friend operator<< ( os, c )");
             os << "Chromosome:  "; c.print(os); os << std::endl;
@@ -338,9 +359,9 @@ Chromosome::print(std::ostream& os,
     const std::string pad = " ";
     const SeqSize_t size = get_nbp();
 
-    if (startbp < 0 || startbp > size - 1) { startbp = 0; }
-    if (endbp < 0 || endbp > size - 1) { endbp = size - 1; }
-    if (width < 0) { width = 70; }
+    if (startbp < 0 || startbp > size - 1) startbp = 0;
+    if (endbp < 0 || endbp > size - 1) endbp = size - 1;
+    if (width < 0) width = 70;
     if (header) {
         os << "_nbp=" << get_nbp();
         os << "  _mu=" << get_mu();
@@ -353,25 +374,33 @@ Chromosome::print(std::ostream& os,
         if (center_markbp && markbp >= i && markbp <= endslice) {
             SeqSize_t left_width = markbp - i; 
             SeqSize_t right_width = endslice - markbp; 
-            if (left_width < right_width)
-                { left_pad = right_width - left_width; right_pad = 0; }
-            else if (left_width > right_width) 
-                { left_pad = 0; right_pad = left_width - right_width; }
+            if (left_width < right_width) {
+                left_pad = right_width - left_width;
+                right_pad = 0;
+            } else if (left_width > right_width) { 
+                left_pad = 0;
+                right_pad = left_width - right_width;
+            }
         }
         // now we have our dimensions, do tract if requested
         if (note_markbp && markbp >= i && markbp <= endslice)
-            { os << std::setw(7) << i << "* "; }
+            os << std::setw(7) << i << "* ";
         else
-            { os << std::setw(7) << i << "  "; }
-        while (left_pad > 0) { os << pad; --left_pad; }
-        for (SeqSize_t j = i; j <= endslice; ++j) {
-            if (j == markbp) { os << (tract ? (tract > 0 ? ">" : "<") : "|"); }
-            os << ((X[j] == true) ? "1" : "0");
-            //if (j == markbp) { os << ">"; }
+            os << std::setw(7) << i << "  ";
+        while (left_pad > 0) {
+            os << pad;
+            --left_pad;
         }
-        while (right_pad > 0) { os << pad; --right_pad; }
+        for (SeqSize_t j = i; j <= endslice; ++j) {
+            if (j == markbp) os << (tract ? (tract > 0 ? ">" : "<") : "|");
+            os << ((X[j] == true) ? "1" : "0");
+        }
+        while (right_pad > 0) {
+            os << pad;
+            --right_pad;
+        }
         if (append_markbp && markbp >= i && markbp <= endslice)
-            { os << ":" << std::setw(7) << markbp; }
+            os << ":" << std::setw(7) << markbp;
         os << std::endl;
     }
 };
