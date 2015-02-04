@@ -182,6 +182,8 @@ class Chromosome {
             double     event_threshold;
             double     event_draw;
             SeqSize_t  event_site;
+            int        event_dir;
+            long       event_length;
 
             static void print_header(std::ostream& os = std::cout) 
             {
